@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import IssueList from './IssueList'
+import Home from './Home'
 import Header from './Header'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import './App.css'
 
 class App extends Component {
@@ -12,7 +14,12 @@ class App extends Component {
           <div className="container">
             <div className="columns">
               <div className="column is-three-fifths is-offset-one-fifth">
-                <IssueList/>
+                <BrowserRouter>
+                  <Switch>
+                    <Route exact path="/" component={Home}/>
+                    <Route exact path="/issues" component={IssueList}/>
+                  </Switch>
+                </BrowserRouter>
               </div>
             </div>
           </div>
