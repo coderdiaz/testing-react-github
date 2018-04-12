@@ -1,9 +1,30 @@
-import React, {PureComponent} from 'react'
+import React, {Component} from 'react'
 import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import Issue from './Issue'
+import axios from 'axios'
 
-class IssueList extends PureComponent {
+class IssueList extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      title: '',
+      body: ''
+    }
+    this.handleClick = this.handleClick.bind(this)
+  }
+  handleClick (e) {
+    axios.post('https://api.github.com/repos/coderdiaz/demo-issues/issues', this.state, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    }).then(response => {
+      this.setState({
+        title: '',
+        body: ''
+      })
+    }).catch(err => console.error(err))
+  }
   render () {
     if (this.props.issueQuery && this.props.issueQuery.loading) {
       return <div>Loading data</div>
@@ -17,6 +38,26 @@ class IssueList extends PureComponent {
 
     return (
       <div className="issue-list">
+        <div className="form">
+          <div className="field">
+            <label className="label">Title</label>
+            <div className="control">
+              <input className="input" value={this.state.title} onChange={ (e) => this.setState({ title: e.target.value })} type="text" placeholder="Text input"/>
+            </div>
+          </div>
+          <div className="field">
+            <label className="label">Description</label>
+            <div className="control">
+              <textarea value={this.state.body} onChange={ (e) => this.setState({ body: e.target.value })} className="textarea" placeholder="Textarea"/>
+            </div>
+          </div>
+          <div className="field">
+            <div className="control">
+              <button onClick={this.handleClick} className="button is-link">Create new issue</button>
+            </div>
+          </div>
+        </div>
+        <hr/>
         <div className="issue-count">
           <span className="tag is-black is-medium">
             Total of issues: {issuesTotal}
@@ -56,6 +97,7 @@ export default graphql(ISSUE_QUERY, {
     const user = 'coderdiaz'
     const number_of_issues = 20
     return {
+      pollInterval: 7000,
       variables: {user, name, number_of_issues}
     }
   }
